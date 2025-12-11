@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Calculations Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 50px 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 450px;
+      width: 100%;
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+    form { display: flex; flex-direction: column; gap: 20px; }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: 500;
+      color: #444;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+    input {
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    button {
+      cursor: pointer;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      margin-top: 10px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .error {
+      color: #e74c3c;
+      background: #fee;
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 4px solid #e74c3c;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .success {
+      color: #27ae60;
+      background: #efe;
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 4px solid #27ae60;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .register-link {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 0.95rem;
+    }
+    .register-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-calculator"></i> Login</h1>
+    <p class="subtitle">Access your calculations dashboard</p>
+
+    <form id="login-form" novalidate>
+      <div class="form-group">
+        <label><i class="fas fa-envelope"></i> Email</label>
+        <input type="email" id="email" placeholder="Enter your email" />
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-lock"></i> Password</label>
+        <input type="password" id="password" placeholder="Enter your password" />
+      </div>
+      <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+    </form>
+
+    <p id="error" style="display:none;"></p>
+    <p id="success" style="display:none;"></p>
+    
+    <div class="register-link">
+      Don't have an account? <a href="/static/register.html">Register here</a>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const errorEl = document.getElementById('error');
+    const successEl = document.getElementById('success');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.textContent = '';
+      successEl.textContent = '';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email.includes('@')) {
+        errorEl.textContent = 'Please enter a valid email.';
+        return;
+      }
+      if (!password) {
+        errorEl.textContent = 'Password is required.';
+        return;
+      }
+
+      try {
+        const resp = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (resp.ok) {
+          const data = await resp.json();
+          localStorage.setItem('token', data.access_token);
+          successEl.textContent = 'Login successful! Redirecting...';
+          setTimeout(() => {
+            window.location.href = '/static/calculations.html';
+          }, 1000);
+        } else if (resp.status === 401) {
+          errorEl.textContent = 'Invalid credentials.';
+        } else {
+          const errData = await resp.json().catch(() => ({}));
+          errorEl.textContent = errData.detail || 'Login failed.';
+        }
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+      }
+    });
+  </script>
+</body>
+</html>

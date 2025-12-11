@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculations Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      backdrop-filter: blur(10px);
+    }
+    h1 { 
+      color: #667eea; 
+      font-size: 2.5rem; 
+      margin-bottom: 10px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .header-subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 1rem;
+    }
+    .section { 
+      background: white;
+      border: none;
+      padding: 30px; 
+      margin: 20px 0; 
+      border-radius: 15px; 
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+    }
+    h2 { 
+      color: #333; 
+      border-left: 4px solid #667eea;
+      padding-left: 15px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    form { display: flex; flex-direction: column; gap: 20px; }
+    label {
+      font-weight: 500;
+      color: #444;
+      font-size: 0.95rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+    input, select { 
+      padding: 12px 16px; 
+      font-size: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      width: 100%;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    button { 
+      cursor: pointer; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; 
+      border: none; 
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    button:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .error { 
+      color: #e74c3c; 
+      background: #fee;
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 4px solid #e74c3c;
+      font-weight: 500;
+    }
+    .success { 
+      color: #27ae60; 
+      background: #efe;
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 4px solid #27ae60;
+      font-weight: 500;
+    }
+    .calculation-list { list-style: none; padding: 0; }
+    .calculation-item { 
+      border: 2px solid #f0f0f0;
+      padding: 20px; 
+      margin: 12px 0; 
+      border-radius: 12px; 
+      background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+      transition: all 0.3s ease;
+    }
+    .calculation-item:hover {
+      border-color: #667eea;
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+    }
+    .calculation-item strong {
+      color: #667eea;
+    }
+    .calculation-actions { display: flex; gap: 12px; margin-top: 15px; }
+    .calculation-actions button { padding: 8px 16px; font-size: 13px; flex: 1; }
+    .delete-btn { 
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+    .delete-btn:hover { 
+      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+    }
+    .edit-btn { 
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+    .edit-btn:hover { 
+      box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    }
+    .logout-btn { 
+      background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+    }
+    .logout-btn:hover { 
+      box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+    }
+    nav { 
+      display: flex; 
+      gap: 12px; 
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    nav button { 
+      flex: 1;
+      min-width: 180px;
+    }
+    .form-group { display: flex; gap: 15px; }
+    .form-group > div { flex: 1; }
+    .result-display { 
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      padding: 15px; 
+      border-radius: 10px; 
+      margin-top: 15px; 
+      font-weight: 600;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #2e7d32;
+      border: 2px solid #81c784;
+    }
+    .refresh-btn {
+      background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+      box-shadow: 0 4px 15px rgba(26, 188, 156, 0.3);
+    }
+    .refresh-btn:hover {
+      box-shadow: 0 6px 20px rgba(26, 188, 156, 0.4);
+    }
+    @media (max-width: 768px) {
+      .container { padding: 20px; }
+      h1 { font-size: 2rem; }
+      nav button { min-width: 100%; }
+      .form-group { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-calculator"></i> Calculations Manager</h1>
+    <p class="header-subtitle">Manage your calculations with ease</p>
+    
+    <!-- Logout Button -->
+    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+
+    <!-- Navigation Tabs -->
+    <nav>
+      <button onclick="showSection('browse')"><i class="fas fa-list"></i> Browse Calculations</button>
+      <button onclick="showSection('add')"><i class="fas fa-plus-circle"></i> Add Calculation</button>
+      <button onclick="showSection('edit')"><i class="fas fa-edit"></i> Edit Calculation</button>
+    </nav>
+
+    <!-- Global Error/Success Messages -->
+    <div id="global-error" class="error" style="display: none;"></div>
+    <div id="global-success" class="success" style="display: none;"></div>
+
+    <!-- BROWSE Section -->
+    <div id="browse" class="section" style="display: none;">
+      <h2><i class="fas fa-list"></i> Browse All Calculations</h2>
+      <button class="refresh-btn" onclick="fetchCalculations()"><i class="fas fa-sync-alt"></i> Refresh Calculations</button>
+      <ul id="calculations-list" class="calculation-list"></ul>
+      <div id="browse-error" class="error" style="display: none;"></div>
+    </div>
+
+    <!-- ADD Section -->
+    <div id="add" class="section" style="display: none;">
+      <h2><i class="fas fa-plus-circle"></i> Add New Calculation</h2>
+      <form id="add-form" novalidate>
+        <label>
+          Operand A (number):
+          <input type="number" id="add-a" step="any" required />
+        </label>
+        <label>
+          Operand B (number):
+          <input type="number" id="add-b" step="any" required />
+        </label>
+        <label>
+          Operation Type:
+          <select id="add-type" required>
+            <option value="">-- Select Operation --</option>
+            <option value="Add">Add (+)</option>
+            <option value="Sub">Subtract (-)</option>
+            <option value="Multiply">Multiply (×)</option>
+            <option value="Divide">Divide (÷)</option>
+          </select>
+        </label>
+        <button type="submit">Create Calculation</button>
+      </form>
+      <div id="add-error" class="error" style="display: none;"></div>
+      <div id="add-success" class="success" style="display: none;"></div>
+    </div>
+
+    <!-- EDIT Section -->
+    <div id="edit" class="section" style="display: none;">
+      <h2><i class="fas fa-edit"></i> Edit Calculation</h2>
+      <form id="edit-form" novalidate>
+        <label>
+          Calculation ID:
+          <input type="number" id="edit-id" min="1" required />
+        </label>
+        <label>
+          Operand A (number):
+          <input type="number" id="edit-a" step="any" />
+        </label>
+        <label>
+          Operand B (number):
+          <input type="number" id="edit-b" step="any" />
+        </label>
+        <label>
+          Operation Type:
+          <select id="edit-type">
+            <option value="">-- Leave Unchanged --</option>
+            <option value="Add">Add (+)</option>
+            <option value="Sub">Subtract (-)</option>
+            <option value="Multiply">Multiply (×)</option>
+            <option value="Divide">Divide (÷)</option>
+          </select>
+        </label>
+        <button type="submit">Update Calculation</button>
+      </form>
+      <div id="edit-error" class="error" style="display: none;"></div>
+      <div id="edit-success" class="success" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script>
+    // Helper: Get token from localStorage
+    function getToken() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/static/login.html';
+      }
+      return token;
+    }
+
+    // Helper: Show section and hide others
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+      document.getElementById(sectionId).style.display = 'block';
+      
+      // Clear messages when switching sections
+      clearAllMessages();
+      
+      // If browsing, fetch calculations
+      if (sectionId === 'browse') {
+        fetchCalculations();
+      }
+    }
+
+    // Helper: Clear all error/success messages
+    function clearAllMessages() {
+      document.getElementById('global-error').style.display = 'none';
+      document.getElementById('global-error').textContent = '';
+      document.getElementById('global-success').style.display = 'none';
+      document.getElementById('global-success').textContent = '';
+      document.getElementById('browse-error').style.display = 'none';
+      document.getElementById('browse-error').textContent = '';
+      document.getElementById('add-error').style.display = 'none';
+      document.getElementById('add-error').textContent = '';
+      document.getElementById('add-success').style.display = 'none';
+      document.getElementById('add-success').textContent = '';
+      document.getElementById('edit-error').style.display = 'none';
+      document.getElementById('edit-error').textContent = '';
+      document.getElementById('edit-success').style.display = 'none';
+      document.getElementById('edit-success').textContent = '';
+    }
+
+    // Helper: Show error message
+    function showError(elementId, message) {
+      const el = document.getElementById(elementId);
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+
+    // Helper: Show success message
+    function showSuccess(elementId, message) {
+      const el = document.getElementById(elementId);
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+
+    // BROWSE: Fetch all user calculations
+    async function fetchCalculations() {
+      const token = getToken();
+      try {
+        const resp = await fetch('/api/calculations/', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (resp.status === 401) {
+          showError('browse-error', 'Session expired. Redirecting to login...');
+          setTimeout(() => window.location.href = '/static/login.html', 1500);
+          return;
+        }
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          showError('browse-error', errData.detail || 'Failed to fetch calculations.');
+          return;
+        }
+
+        const calculations = await resp.json();
+        const listEl = document.getElementById('calculations-list');
+        
+        if (calculations.length === 0) {
+          listEl.innerHTML = '<li>No calculations found. Create one to get started!</li>';
+          return;
+        }
+
+        listEl.innerHTML = calculations.map(calc => `
+          <li class="calculation-item">
+            <strong>ID: ${calc.id}</strong> | 
+            ${calc.a} ${getOperationSymbol(calc.type)} ${calc.b} = <strong>${calc.result.toFixed(2)}</strong>
+            <div class="calculation-actions">
+              <button class="edit-btn" onclick="loadCalculationForEdit(${calc.id})">Edit</button>
+              <button class="delete-btn" onclick="deleteCalculation(${calc.id})">Delete</button>
+            </div>
+          </li>
+        `).join('');
+      } catch (err) {
+        showError('browse-error', 'Network error. Please try again.');
+      }
+    }
+
+    // Helper: Get operation symbol
+    function getOperationSymbol(type) {
+      const symbols = { Add: '+', Sub: '-', Multiply: '×', Divide: '÷' };
+      return symbols[type] || type;
+    }
+
+    // ADD: Handle form submission
+    document.getElementById('add-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = getToken();
+      
+      const a = parseFloat(document.getElementById('add-a').value);
+      const b = parseFloat(document.getElementById('add-b').value);
+      const type = document.getElementById('add-type').value;
+
+      // Client-side validation
+      if (isNaN(a) || isNaN(b)) {
+        showError('add-error', 'Operands must be valid numbers.');
+        return;
+      }
+      if (!type) {
+        showError('add-error', 'Please select an operation type.');
+        return;
+      }
+      if (type === 'Divide' && b === 0) {
+        showError('add-error', 'Cannot divide by zero.');
+        return;
+      }
+
+      try {
+        const resp = await fetch('/api/calculations/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ a, b, type })
+        });
+
+        if (resp.status === 401) {
+          showError('add-error', 'Session expired. Redirecting to login...');
+          setTimeout(() => window.location.href = '/static/login.html', 1500);
+          return;
+        }
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          showError('add-error', errData.detail || 'Failed to create calculation.');
+          return;
+        }
+
+        const newCalc = await resp.json();
+        showSuccess('add-success', `Calculation created successfully! Result: ${newCalc.result.toFixed(2)}`);
+        document.getElementById('add-form').reset();
+
+        // Automatically switch to Browse tab and refresh to show the new calculation
+        setTimeout(() => {
+          showSection('browse');
+        }, 1500);
+      } catch (err) {
+        showError('add-error', 'Network error. Please try again.');
+      }
+    });
+
+    // EDIT: Load calculation for editing
+    async function loadCalculationForEdit(calcId) {
+      const token = getToken();
+      try {
+        const resp = await fetch(`/api/calculations/${calcId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!resp.ok) {
+          showError('edit-error', 'Failed to load calculation.');
+          return;
+        }
+
+        const calc = await resp.json();
+        document.getElementById('edit-id').value = calc.id;
+        document.getElementById('edit-a').value = calc.a;
+        document.getElementById('edit-b').value = calc.b;
+        document.getElementById('edit-type').value = '';
+        showSection('edit');
+      } catch (err) {
+        showError('edit-error', 'Network error. Please try again.');
+      }
+    }
+
+    // EDIT: Handle form submission
+    document.getElementById('edit-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = getToken();
+      
+      const calcId = document.getElementById('edit-id').value;
+      const a = document.getElementById('edit-a').value ? parseFloat(document.getElementById('edit-a').value) : undefined;
+      const b = document.getElementById('edit-b').value ? parseFloat(document.getElementById('edit-b').value) : undefined;
+      const type = document.getElementById('edit-type').value || undefined;
+
+      // Build update object
+      const updateData = {};
+      if (!isNaN(a) && a !== undefined) updateData.a = a;
+      if (!isNaN(b) && b !== undefined) updateData.b = b;
+      if (type) updateData.type = type;
+
+      if (Object.keys(updateData).length === 0) {
+        showError('edit-error', 'Please change at least one field.');
+        return;
+      }
+
+      // Validation: Check for divide by zero
+      if (updateData.type === 'Divide' && updateData.b === 0) {
+        showError('edit-error', 'Cannot divide by zero.');
+        return;
+      }
+
+      try {
+        const resp = await fetch(`/api/calculations/${calcId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updateData)
+        });
+
+        if (resp.status === 401) {
+          showError('edit-error', 'Session expired. Redirecting to login...');
+          setTimeout(() => window.location.href = '/static/login.html', 1500);
+          return;
+        }
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          showError('edit-error', errData.detail || 'Failed to update calculation.');
+          return;
+        }
+
+        const updated = await resp.json();
+        showSuccess('edit-success', `Calculation updated! New result: ${updated.result.toFixed(2)}`);
+
+        // Refresh calculations list if browse is visible
+        const browseSection = document.getElementById('browse');
+        if (browseSection.style.display !== 'none') {
+          fetchCalculations();
+        }
+      } catch (err) {
+        showError('edit-error', 'Network error. Please try again.');
+      }
+    });
+
+    // DELETE: Delete a calculation
+    async function deleteCalculation(calcId) {
+      if (!confirm('Are you sure you want to delete this calculation?')) {
+        return;
+      }
+
+      const token = getToken();
+      try {
+        const resp = await fetch(`/api/calculations/${calcId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (resp.status === 401) {
+          showError('browse-error', 'Session expired. Redirecting to login...');
+          setTimeout(() => window.location.href = '/static/login.html', 1500);
+          return;
+        }
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          showError('browse-error', errData.detail || 'Failed to delete calculation.');
+          return;
+        }
+
+        showSuccess('browse-error', 'Calculation deleted successfully!');
+        setTimeout(() => {
+          fetchCalculations();
+        }, 500);
+      } catch (err) {
+        showError('browse-error', 'Network error. Please try again.');
+      }
+    }
+
+    // LOGOUT: Clear token and redirect
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/static/login.html';
+    }
+
+    // Initialize: Show browse section on page load
+    window.addEventListener('load', () => {
+      getToken(); // Ensure user is logged in
+      showSection('browse');
+    });
+  </script>
+</body>
+</html>
